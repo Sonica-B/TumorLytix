@@ -34,3 +34,7 @@ transforms = A.Compose(
 
 train_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 val_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData"
+
+run_stage1 = True  # Enable/Disable CycleGAN Training
+run_stage2 = True  # Enable/Disable VE-JP Diffusion Training
+run_stage3 = True  # Enable/Disable Multi-Modality Ensemble and Segmentation
