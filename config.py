@@ -30,3 +30,7 @@ transforms = A.Compose(
         ToTensorV2()
     ]
 )
+
+
+train_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+val_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData"
