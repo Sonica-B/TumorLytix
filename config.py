@@ -25,12 +25,12 @@ CHECKPOINT_CRITIC_ABNORMAL = 'critic_abnormal.pth.tar'
 
 transforms = A.Compose(
     [
-        A.Resize(width = 256, height=256),
-        A.Normalize(mean=[0.5,0.5,0.5],std = [0.5,0.5,0.5],max_pixel_value=255),
-        ToTensorV2()
-    ]
+        A.Resize(256, 256),
+        A.Normalize(mean=0.5, std=0.5, max_pixel_value=255),
+        ToTensorV2(),
+    ],
+    additional_targets={"mask": "mask"},
 )
-
 
 train_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 val_dir = "D:/WPI Assignments/TumorLytix/data/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData"

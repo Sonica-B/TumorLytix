@@ -12,16 +12,17 @@ def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
 
 
 def load_checkpoint(checkpoint_file, model, optimizer, lr):
+    if not os.path.exists(checkpoint_file):
+        print(f"Checkpoint file '{checkpoint_file}' not found. Skipping checkpoint loading.")
+        return
     print("=> Loading checkpoint")
     checkpoint = torch.load(checkpoint_file, map_location=config.DEVICE)
     model.load_state_dict(checkpoint["state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer"])
 
-    # If we don't do this then it will just have learning rate of old checkpoint
-    # and it will lead to many hours of debugging \:
+    # Ensure optimizer uses the correct learning rate
     for param_group in optimizer.param_groups:
         param_group["lr"] = lr
-
 
 def seed_everything(seed=42):
     os.environ["PYTHONHASHSEED"] = str(seed)
