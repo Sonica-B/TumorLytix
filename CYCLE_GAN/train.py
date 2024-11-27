@@ -21,66 +21,70 @@ def train_network(disc_healthy,disc_tumor,gen_healthy,gen_tumor,loader,opt_gen,o
         healthy = healthy.to(config.DEVICE)
         tumor = tumor.to(config.DEVICE)
 
-    with torch.cuda.amp.autocast():  # for discriminator
+        with torch.cuda.amp.autocast():  # for discriminator
 
-        fake_tumor = gen_tumor(healthy)  # generate tumor image from healthy brain scan 
+            fake_tumor = gen_tumor(healthy)  # generate tumor image from healthy brain scan 
 
-        d_tumor_real = disc_tumor(tumor)  
-        d_tumor_fake = disc_tumor(fake_tumor.detach())
+            d_tumor_real = disc_tumor(tumor)  
+            d_tumor_fake = disc_tumor(fake_tumor.detach())
 
-        d_tumor_real_loss = mse(d_tumor_real,torch.ones_like(d_tumor_real)) # identity loss
-        d_tumor_fake_loss = mse(d_tumor_fake,torch.zeros_like(d_tumor_fake))
+            d_tumor_real_loss = mse(d_tumor_real,torch.ones_like(d_tumor_real)) # identity loss
+            d_tumor_fake_loss = mse(d_tumor_fake,torch.zeros_like(d_tumor_fake))
 
-        d_tumor_loss = d_tumor_fake_loss + d_tumor_real_loss
+            d_tumor_loss = d_tumor_fake_loss + d_tumor_real_loss
 
-        fake_healthy = gen_healthy(tumor)
-        d_healthy_real = disc_healthy(healthy)
-        d_healthy_fake = disc_healthy(fake_healthy.detach())
+            fake_healthy = gen_healthy(tumor)
+            d_healthy_real = disc_healthy(healthy)
+            d_healthy_fake = disc_healthy(fake_healthy.detach())
 
-        d_healthy_real_loss = mse(d_healthy_real,torch.ones_like(d_healthy_real))
-        d_healthy_fake_loss = mse(d_healthy_fake,torch.zeros_like(d_healthy_fake))
+            d_healthy_real_loss = mse(d_healthy_real,torch.ones_like(d_healthy_real))
+            d_healthy_fake_loss = mse(d_healthy_fake,torch.zeros_like(d_healthy_fake))
 
-        d_healthy_loss = d_healthy_fake_loss + d_healthy_real_loss
+            d_healthy_loss = d_healthy_fake_loss + d_healthy_real_loss
 
-        Discriminator_Loss = (d_healthy_loss + d_tumor_loss) / 2
+            Discriminator_Loss = (d_healthy_loss + d_tumor_loss) / 2
 
-    opt_disc.zero_grad()
-    disc_sc.scale(Discriminator_Loss).backward()
-    disc_sc.step(opt_disc)
-    disc_sc.update()
+        opt_disc.zero_grad()
+        disc_sc.scale(Discriminator_Loss).backward()
+        disc_sc.step(opt_disc)
+        disc_sc.update()
 
 
-    with torch.cuda.amp.autocast():  # for generator
+        with torch.cuda.amp.autocast():  # for generator
 
-        d_tumor_fake = disc_tumor(fake_tumor)
-        d_healthy_fake = disc_healthy(fake_healthy)
+            d_tumor_fake = disc_tumor(fake_tumor)
+            d_healthy_fake = disc_healthy(fake_healthy)
 
-        loss_gen_healthy = mse(d_healthy_fake,torch.ones_like(d_healthy_fake))
-        loss_gen_tumor = mse(d_tumor_fake,torch.ones_like(d_tumor_fake))
+            loss_gen_healthy = mse(d_healthy_fake,torch.ones_like(d_healthy_fake))
+            loss_gen_tumor = mse(d_tumor_fake,torch.ones_like(d_tumor_fake))
 
-        # cycle loss
+            # cycle loss
 
-        cycle_healthy = gen_healthy(fake_tumor)
-        cycle_tumor = gen_tumor(fake_healthy)
+            cycle_healthy = gen_healthy(fake_tumor)
+            cycle_tumor = gen_tumor(fake_healthy)
 
-        cycle_healthy_loss = l1(healthy,cycle_healthy)
-        cycle_tumor_loss = l1(tumor,cycle_tumor)
+            cycle_healthy_loss = l1(healthy,cycle_healthy)
+            cycle_tumor_loss = l1(tumor,cycle_tumor)
 
-        # identity loss
+            # identity loss
 
-        identity_healthy = gen_healthy(healthy)
-        identity_tumor = gen_tumor(tumor)
+            identity_healthy = gen_healthy(healthy)
+            identity_tumor = gen_tumor(tumor)
 
-        identity_healthy_loss = l1(healthy,identity_healthy)
-        identity_tumor_loss = l1(tumor,identity_tumor)
+            identity_healthy_loss = l1(healthy,identity_healthy)
+            identity_tumor_loss = l1(tumor,identity_tumor)
 
-        Generator_Loss = (loss_gen_healthy + loss_gen_tumor + cycle_healthy_loss * config.lambda_cycle + cycle_tumor_loss * config.lambda_cycle + identity_healthy_loss * config.lambda_identity + identity_tumor_loss * config.lambda_identity)
+            Generator_Loss = (loss_gen_healthy + loss_gen_tumor + cycle_healthy_loss * config.lambda_cycle + cycle_tumor_loss * config.lambda_cycle + identity_healthy_loss * config.lambda_identity + identity_tumor_loss * config.lambda_identity)
 
-    opt_gen.zero_grad()
-    gen_sc.scale(Generator_Loss).backward()
-    gen_sc.step(opt_gen)
-    gen_sc.update()
-    
+        opt_gen.zero_grad()
+        gen_sc.scale(Generator_Loss).backward()
+        gen_sc.step(opt_gen)
+        gen_sc.update()
+        
+
+        if index % 20 == 0:
+                save_image(fake_healthy * 0.5 + 0.5, f"saved_images/healthy/healthy_{index}.png")
+                save_image(fake_tumor * 0.5 + 0.5, f"saved_images/tumor/tumor_{index}.png")
 
     pass
 
