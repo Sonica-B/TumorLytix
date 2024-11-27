@@ -13,7 +13,7 @@ from dataloader import TrainData
 from utils import save_checkpoint, load_checkpoint
 
 
-def train_network(disc_healthy,disc_tumor,gen_healthy,gen_tumor,loader,opt_gen,opt_disc,l1,mse,gen_sc,disc_sc):
+def train_network(epoch,disc_healthy,disc_tumor,gen_healthy,gen_tumor,loader,opt_gen,opt_disc,l1,mse,gen_sc,disc_sc):
       
     loop = tqdm(loader,leave=True)
 
@@ -82,9 +82,9 @@ def train_network(disc_healthy,disc_tumor,gen_healthy,gen_tumor,loader,opt_gen,o
         gen_sc.update()
         
 
-        if index % 20 == 0:
-                save_image(fake_healthy * 0.5 + 0.5, f"saved_images/healthy/healthy_{index}.png")
-                save_image(fake_tumor * 0.5 + 0.5, f"saved_images/tumor/tumor_{index}.png")
+        if index % 5 == 0:
+                save_image(fake_healthy * 0.5 + 0.5, f"saved_images/healthy/healthy_epoch_{epoch}_{index}.png")
+                save_image(fake_tumor * 0.5 + 0.5, f"saved_images/tumor/tumor_epoch_{epoch}_{index}.png")
 
     pass
 
@@ -120,4 +120,4 @@ def main():
 
 
     for epoch in range(config.num_epochs):
-        train_network(discriminator_normal,discriminator_abnormal,generator_normal,generator_abnormal,train_loader,optimizer_discriminator,optimizer_discriminator,L1,MSE,generator_scaler,discriminator_scaler)
+        train_network(epoch,discriminator_normal,discriminator_abnormal,generator_normal,generator_abnormal,train_loader,optimizer_discriminator,optimizer_discriminator,L1,MSE,generator_scaler,discriminator_scaler)
