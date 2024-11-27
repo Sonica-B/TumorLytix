@@ -13,7 +13,7 @@ lambda_identity = 0.0
 lambda_cycle = 10
 num_workers = 4
 num_epochs = 200
-load_model = True
+load_model = False
 save_model = True
 
 CHECKPOINT_GEN_NORMAL = 'generate_normal.pth.tar'
