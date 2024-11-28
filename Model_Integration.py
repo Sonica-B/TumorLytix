@@ -4,14 +4,14 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-
 import config
+from CYCLE_GAN.dataloader import TrainData
 # from CYCLE_GAN.dataloader import TrainData
 from CYCLE_GAN.discriminator import Discriminator
 from CYCLE_GAN.generator import Generator
 from CYCLE_GAN.train import train_network
 from DIffusion_Model.VE_JP import VEJP_Diffusion, train_diffusion
-from DIffusion_Model.dataloader import TrainData
+from dataloader import TrainData
 from segmentation import visualize_results, apply_segmentation
 from utils import load_checkpoint
 
@@ -41,20 +41,23 @@ def stage1_cyclegan():
         load_checkpoint(config.CHECKPOINT_CRITIC_ABNORMAL,discriminator_abnormal,optimizer_discriminator,config.learning_rate)
 
 
-    train_dataset = TrainData(
-        root_dir=config.train_dir,
-        transform=config.transforms
-    )
-
-
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=config.batch_size,
-        shuffle=True,
-        num_workers=config.num_workers,
-        pin_memory=True
-    )
+    # train_dataset = TrainData(
+    #     root_dir=config.train_dir,
+    #     transform=config.transforms
+    # )
+    #
+    #
+    #
+    # train_loader = DataLoader(
+    #     train_dataset,
+    #     batch_size=config.batch_size,
+    #     shuffle=True,
+    #     num_workers=config.num_workers,
+    #     pin_memory=True
+    # )
+    train_dataset = CycleGANDataset(root_normal=config.train_dir_normal, root_abnormal=config.train_dir_abnormal,
+                                    transform=config.transforms)
+    train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers)
 
     generator_scaler = torch.cuda.amp.GradScaler()  # Controls gradient underflow during backpropagation
 
