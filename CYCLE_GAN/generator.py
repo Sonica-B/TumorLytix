@@ -74,18 +74,18 @@ class Generator(nn.Module): # following cycle gan paper architecture
           return torch.tanh(x)  # Normalization to [-1,1]
 
 
-def test():
+# def test():
 
-     img_chan = 3 
-     img_size = 256 
+#      img_chan = 3 
+#      img_size = 256 
 
-     x = torch.randn((3,3,256,256))
+#      x = torch.randn((3,3,256,256))
 
-     out = Generator(img_chan)
-     print(out(x).shape)
+#      out = Generator(img_chan)
+#      # print(out(x).shape) 
 
-if __name__ == "__main__":
-     test()
+# if __name__ == "__main__":
+#      test()
 
 
 

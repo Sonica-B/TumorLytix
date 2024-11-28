@@ -22,7 +22,7 @@ class Block(nn.Module):
     def forward(self,x):
 
         x = self.conv(x)
-        print(f"Shape after Block: {x.shape}")
+        # print(f"Shape after Block: {x.shape}") 
         return x
     
 
@@ -54,23 +54,23 @@ class Discriminator(nn.Module):
     def forward(self, x):
         # Starting layer
         x = self.start(x)
-        print(f"Shape after start: {x.shape}")
+        # print(f"Shape after start: {x.shape}") 
 
         # Pass through the rest of the layers
         x = self.model(x)
-        print(f"Shape after final layer: {x.shape}")
+        # print(f"Shape after final layer: {x.shape}") 
         
         # Final output with sigmoid
         return torch.sigmoid(x) # we need the final value to be between 0 and 1 , hence sigmoid function
     
 # Following the PATCH GAN principle , we get a 15x15 output where each value has a receptive field of 70x70 in the original image
-def test():
+# def test():
 
-    x = torch.randn((5,3,256,256))
-    model = Discriminator(in_channels=3)
-    pred = model(x)
-    print (pred.shape)
+#     x = torch.randn((5,3,256,256))
+#     model = Discriminator(in_channels=3)
+#     pred = model(x)
+#     print (pred.shape)
 
 
-if __name__ == "__main__":
-    test()
+# if __name__ == "__main__":
+#     test()

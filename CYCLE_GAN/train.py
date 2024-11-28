@@ -1,6 +1,6 @@
 import torch
 import torch.amp
-from torch.utils.data import dataloader
+from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
@@ -9,7 +9,7 @@ import config
 from torchvision.utils import save_image
 from generator import Generator
 from discriminator import Discriminator
-from dataloader import TrainData
+from dataset import TrainData
 from utils import save_checkpoint, load_checkpoint
 
 
@@ -97,9 +97,9 @@ def main():
     generator_abnormal = Generator(channels=3,num_residual_blocks=9).to(config.DEVICE)
 
     # take values from paper
-    optimizer_discriminator = optim.adam(list(discriminator_normal.parameters()) + list(discriminator_abnormal.parameters()), lr = config.learning_rate, betas=(0.5,0.999))
+    optimizer_discriminator = optim.Adam(list(discriminator_normal.parameters()) + list(discriminator_abnormal.parameters()), lr = config.learning_rate, betas=(0.5,0.999))
 
-    optimizer_generator = optim.adam(list(generator_normal.parameters()) + list(generator_abnormal.parameters()), lr = config.learning_rate, betas=(0.5,0.999))
+    optimizer_generator = optim.Adam(list(generator_normal.parameters()) + list(generator_abnormal.parameters()), lr = config.learning_rate, betas=(0.5,0.999))
 
     L1 = nn.L1Loss()  # for cycle consistency loss --> check paper
     MSE = nn.MSELoss()   # for individual adversarial loss --> check paper
@@ -111,13 +111,21 @@ def main():
         load_checkpoint(config.CHECKPOINT_DISC_ABNORMAL,discriminator_abnormal,optimizer_discriminator,config.learning_rate)
 
     # add path here for healthy and tumor images 
-    train_dataset = TrainData(config.train_dir,config.train_dir,config.transforms)
+    train_dataset = TrainData(config.train_dir + '\\healthy' ,config.train_dir + '\\tumor',config.transforms)
 
-    train_loader = dataloader(train_dataset,config.batch_size,shuffle=True,num_workers=config.num_workers,pin_memory=True)
+    train_loader = DataLoader(train_dataset,config.batch_size,shuffle=True,num_workers=config.num_workers,pin_memory=True)
 
-    generator_scaler = torch.amp.grad_scaler()  # controls gradient underflow during backpropogations
-    discriminator_scaler = torch.amp.grad_scaler()
+    generator_scaler = torch.cuda.amp.GradScaler()  # controls gradient underflow during backpropogations
+    discriminator_scaler = torch.cuda.amp.GradScaler()
 
 
     for epoch in range(config.num_epochs):
         train_network(epoch,discriminator_normal,discriminator_abnormal,generator_normal,generator_abnormal,train_loader,optimizer_discriminator,optimizer_discriminator,L1,MSE,generator_scaler,discriminator_scaler)
+    if config.save_model:
+        save_checkpoint(generator_normal,optimizer_generator,filename=config.CHECKPOINT_GEN_NORMAL)
+        save_checkpoint(generator_abnormal,optimizer_generator,filename=config.CHECKPOINT_GEN_ABNORMAL)
+        save_checkpoint(discriminator_normal,optimizer_discriminator,filename=config.CHECKPOINT_DISC_NORMAL)
+        save_checkpoint(discriminator_abnormal,optimizer_discriminator,filename=config.CHECKPOINT_DISC_ABNORMAL)
+
+if __name__ == '__main__':
+    main()
