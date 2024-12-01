@@ -3,17 +3,21 @@ import os
 from PIL import Image
 import numpy as np
 from torchvision import transforms
+from typing import List, Optional, Tuple
 
 class TrainData(Dataset):
 
-    def __init__(self,root_normal,root_abnormal,transform=None):
+    def __init__(self, 
+                 root_normal: str,
+                 root_abnormal: str,
+                 transform: Optional[transforms.Compose] = None) -> None:
 
-        self.root_normal = root_normal   # normal brain images directory
-        self.root_abnormal = root_abnormal # abnormal brain images directory
+        self.root_normal: str = root_normal   # normal brain images directory
+        self.root_abnormal: str = root_abnormal # abnormal brain images directory
 
         self.transform = transform
 
-        self.normal_images = os.listdir(self.root_normal)
+        self.normal_images: List[str] = os.listdir(self.root_normal)
         self.abnormal_images = os.listdir(self.root_abnormal)
 
         self.length_dataset = max(len(self.normal_images),len(self.abnormal_images))
