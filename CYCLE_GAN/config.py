@@ -6,8 +6,8 @@ import torch
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Hyperparameters
-BATCH_SIZE = 32
-NUM_EPOCHS = 500
+BATCH_SIZE = 16
+NUM_EPOCHS = 50
 LEARNING_RATE = 1e-4
 LAMBDA_CYCLE = 20.0
 LAMBDA_IDENTITY = 0.5
