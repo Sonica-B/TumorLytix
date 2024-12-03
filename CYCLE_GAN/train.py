@@ -87,16 +87,18 @@ def train_step(
     gen_scaler.update()
 
     # Save generated images periodically
-    if batch_idx % 100 == 0:
-        save_dir = Path("./saved_images")
-        save_dir.mkdir(exist_ok=True)
+    save_dir = Path("./saved_images")
+    save_dir.mkdir(exist_ok=True)
 
-        vutils.save_image(healthy_images, save_dir / f"healthy_epoch{epoch}_batch{batch_idx}.png", normalize=True)
-        vutils.save_image(fake_tumor, save_dir / f"fake_tumor_epoch{epoch}_batch{batch_idx}.png", normalize=True)
-        vutils.save_image(tumor_images, save_dir / f"tumor_epoch{epoch}_batch{batch_idx}.png", normalize=True)
-        vutils.save_image(fake_healthy, save_dir / f"fake_healthy_epoch{epoch}_batch{batch_idx}.png", normalize=True)
+    # Save each image with a unique filename
+    for i in range(healthy_images.size(0)):
+    #     vutils.save_image(healthy_images[i], save_dir /  f"healthy/healthy_epoch{epoch}_batch{batch_idx}_img{i}.png", normalize=True)
+        vutils.save_image(fake_tumor[i], save_dir / f"tumor/fake_tumor_epoch{epoch}_batch{batch_idx}_img{i}.png", normalize=True)
+        # vutils.save_image(tumor_images[i], save_dir / f"tumor_epoch{epoch}_batch{batch_idx}_img{i}.png", normalize=True)
+        vutils.save_image(fake_healthy[i], save_dir / f"healthy/fake_healthy_epoch{epoch}_batch{batch_idx}_img{i}.png", normalize=True)
 
     return total_disc_loss.item(), total_gen_loss.item()
+
 
 def train_model(
     disc_healthy: nn.Module,
